@@ -1,9 +1,4 @@
-"""Hybrid PPO (T1), manuscript configuration. Requires torch, numpy and gymnasium.
-Train: python train_t1.py --train-instances TRAIN_DIR --test-instances TEST_DIR
-Evaluate: python train_t1.py --evaluate runs/seed42/final.pt --test-instances TEST_DIR
-Each directory contains one <seed>.json per instance. For zero-based episode i the
-training file ID is 1000000000 + 20000 * training_seed + i. Test IDs start at 180000.
-See YardSimulator._load_instance for the top-first stack format.
+"""Hybrid PPO 
 """
 from __future__ import annotations
 
