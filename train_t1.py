@@ -23,6 +23,7 @@ class PPOConfig:
     batch_size: int = 250
     epochs: int = 5
     lr: float = 1e-4
+    reward_scale: float = 1376.0
     gamma: float = 1.
     gae_lambda: float = 0.98
     clip: float = 0.2
@@ -114,11 +115,12 @@ def collect(policy, envs, start, stop, seed, config, record, device, train_insta
             nxt, reward, done, truncated, info = envs[lane].step(a)
             if truncated:
                 raise RuntimeError("Unexpected truncated trajectory")
-            path.append((obs, a, float(logp[j]), float(values[j]), reward))
+            training_reward = reward / config.reward_scale
+            path.append((obs, a, float(logp[j]), float(values[j]), training_reward))
             if done:
                 ret = sum(t[-1] for t in path)
-                if not np.isclose(ret, -info['makespan']):
-                    raise RuntimeError("Return does not equal negative makespan")
+                if not np.isclose(ret, -info['makespan'] / config.reward_scale):
+                    raise RuntimeError("Training return does not equal negative makespan divided by the reward scale")
                 record.writerow((index+1, info['makespan'], ret))
                 advantage = next_value = 0.
                 for o, act, lp, v, r in reversed(path):
